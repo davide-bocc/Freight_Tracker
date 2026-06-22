@@ -6,7 +6,7 @@
 
 ## Live Demo
 
-*http://localhost:8501/*
+*https://freighttrackergit-38rjyuqchrz5c8vkf6hy7f.streamlit.app/*
 
 ---
 
