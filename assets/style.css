@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #0f2035 !important;
+    color: #e4f0f8;
+}
+
+#MainMenu, footer, header { visibility: hidden; }
+.block-container { padding-top: 1.5rem; }
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #152840 !important;
+    border-right: 1px solid #1e4570;
+}
+
+/* Metric cards */
+[data-testid="metric-container"] {
+    background: #1a3350;
+    border: 1px solid #1e4570;
+    border-radius: 8px;
+    padding: 0.8rem;
+}
+
+[data-testid="stMetricValue"] { color: #00c9a7; }
+
+/* Tab bar */
+[data-testid="stTabs"] button {
+    color: #3d6a8a;
+    font-size: 13px;
+}
+[data-testid="stTabs"] button[aria-selected="true"] {
+    color: #00c9a7;
+    border-bottom-color: #00c9a7 !important;
+}
+
+/* Dataframe */
+[data-testid="stDataFrame"] {
+    border: 1px solid #1e4570 !important;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Buttons */
+[data-testid="stButton"] button {
+    background: transparent;
+    border: 1px solid #1e4570;
+    color: #7fb3d3;
+    border-radius: 6px;
+}
+[data-testid="stButton"] button:hover {
+    border-color: #00c9a7;
+    color: #00c9a7;
+}
+
+/* Primary button */
+[data-testid="stButton"] button[kind="primary"] {
+    background: #00c9a7;
+    border: none;
+    color: #0a1a28;
+    font-weight: 600;
+}
+
+/* Selectbox / inputs */
+[data-testid="stSelectbox"] > div,
+[data-testid="stSlider"] {
+    background: #1a3350;
+    border-color: #1e4570;
+    color: #7fb3d3;
+    border-radius: 6px;
+}
+
+/* Chat input */
+[data-testid="stChatInput"] textarea {
+    background: #1a3350 !important;
+    border: 1px solid #1e4570 !important;
+    color: #e4f0f8 !important;
+    border-radius: 20px !important;
+}
+[data-testid="stChatInput"] textarea:focus {
+    border-color: #00c9a7 !important;
+}
+
+/* Insight pills */
+.insight-pill {
+    background: #1a3350;
+    border-left: 2px solid #00c9a7;
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #7fb3d3;
+}
+
+/* Chat bubbles */
+.chat-user {
+    background: #2278cc;
+    color: #d4eaf8;
+    border-radius: 14px 14px 3px 14px;
+    padding: 10px 14px;
+    margin: 4px 0 4px 20%;
+    font-size: 13px;
+    border: 1px solid #3390e0;
+}
+.chat-assistant {
+    background: #1a3350;
+    color: #7fb3d3;
+    border-radius: 14px 14px 14px 3px;
+    padding: 10px 14px;
+    margin: 4px 20% 4px 0;
+    font-size: 13px;
+    border: 1px solid #1e4570;
+}
+
+/* Section titles */
+.section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #3d6a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 1px solid #1e4570;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+/* Limit badge */
+.limit-badge {
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #00c9a7;
+}
+
+/* Anomaly warning */
+.anomaly-warning {
+    background: rgba(240,96,96,0.08);
+    border: 1px solid rgba(240,96,96,0.25);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #f08080;
+    font-size: 13px;
+}
+
+/* Expander */
+[data-testid="stExpander"] {
+    background: #1a3350;
+    border: 1px solid #1e4570 !important;
+    border-radius: 8px;
+}
+
+/* Header */
+.ft-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: #0f2035;
+    border-bottom: 2px solid #00c9a7;
+    padding: 18px 38px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ft-header .ft-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #e4f0f8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.ft-header .ft-subtitle {
+    font-size: 13px;
+    color: #00c9a7;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+}
+
+/* Spinge il contenuto sotto l'header fisso */
+.block-container {
+    padding-top: 5rem !important;
+}
