@@ -226,12 +226,13 @@ completed 18-month window.
 Most vessels completed 6 voyages over the 18-month window. Three vessels (PIL Karimun, Yangming Triumph and
 ZIM Integrated) show 1 active voyage still in progress, consistent with the simulation cutoff date.
 
- 
--
+
+
 *All data in this project is synthetic. Port coordinates, vessel names and company names are real, but shipment
 volumes, cargo values, delays and routes have been generated algorithmically to simulate plausible patterns. 
 The insights above reflect the statistical distribution built into the seed logic and should not be interpreted
 as real-world shipping intelligence.*
+
 
 
 ---
