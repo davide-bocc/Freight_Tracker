@@ -1,13 +1,12 @@
--- ============================================================================
--- ANALYTICAL QUERIES  —  Freight Tracker
--- 6 business-intelligence queries covering KPIs used in freight operations.
--- ============================================================================
+-- ANALYTICAL QUERIES
+-- 6 business-intelligence queries that answer real operational questions
+-- about delays, revenue concentration and fleet utilization.
 
 
 -- 1. PORT CONGESTION INDEX
--- Measures how much delay (in hours) accumulates at each port relative to
--- the number of vessel calls.  A high index flags ports creating systemic
--- schedule risk; is_transshipment distinguishes hub vs. origin/dest ports.
+-- Measures how much delay accumulates at each port relative to vessel calls.
+-- A high index flags ports that create systemic schedule risk.
+-- is_transshipment distinguishes hub ports from origin/destination ports.
 SELECT
     p.un_locode,
     p.port_name,
@@ -36,7 +35,7 @@ ORDER BY congestion_index DESC;
 -- 2. ON-TIME PERFORMANCE BY TRADE LANE
 -- Trade lane = origin-country to destination-country pair derived from
 -- the shipment's port assignments.  OTP % is the share of shipments
--- arriving with zero delay at their final stop — the primary SLA metric
+-- arriving with zero delay at their final stop, the primary SLA metric
 -- carriers report to customers.
 WITH final_stop AS (
     -- last stop for each voyage (highest sequence number)
@@ -81,7 +80,7 @@ ORDER BY otp_pct ASC;
 
 -- 3. CARGO VALUE CONCENTRATION
 -- Identifies which customers and industries account for the largest share
--- of total freight value — a Pareto / concentration-risk view that
+-- of total freight value, a Pareto / concentration-risk view that
 -- commercial teams use to assess customer dependency.
 WITH totals AS (
     SELECT SUM(total_value_usd) AS grand_total FROM shipment
@@ -150,7 +149,7 @@ ORDER BY utilisation_pct DESC;
 
 -- 5. MONTHLY REVENUE TREND
 -- Books revenue by month of shipment booking, then overlays a 3-month
--- rolling average to smooth seasonality — standard input for executive
+-- rolling average to smooth seasonality, standard input for executive
 -- dashboards and budget-vs-actual reporting.
 WITH monthly AS (
     SELECT

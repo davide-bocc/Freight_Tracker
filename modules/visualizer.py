@@ -1,22 +1,12 @@
 """
-visualizer.py — Plotly chart library for Freight Tracker.
+visualizer.py
 
-All functions return a plotly.graph_objects.Figure.
-No Streamlit imports; safe to call from any host.
+Plotly charts for the Freight Tracker dashboard.
+All functions return a plotly Figure and have no Streamlit dependencies.
 
-MAPS
-    plot_route_map(conn)                — world map, ports sized by call volume
-    plot_shipment_path(conn, bl_number) — single shipment route + event pins
-
-OPERATIONS
-    plot_delay_by_route(df)      — horizontal bar, avg/max delay per route
-    plot_ontime_performance(df)  — donut + KPI annotation (OTP %)
-    plot_voyage_status(df)       — stacked bar of voyage states per vessel
-
-COMMERCIAL
-    plot_top_customers(df)       — horizontal bar coloured by industry
-    plot_revenue_by_lane(df)     — treemap, trade lane -> revenue
-    plot_shipment_status(df)     — donut (count) + bar (value) side by side
+Maps: plot_route_map, plot_shipment_path
+Operations: plot_delay_by_route, plot_ontime_performance, plot_voyage_status
+Commercial: plot_top_customers, plot_revenue_by_lane, plot_shipment_status
 """
 
 from __future__ import annotations
@@ -26,9 +16,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-# ---------------------------------------------------------------------------
 # Style constants
-# ---------------------------------------------------------------------------
 
 _C = {
     "navy": "#1a3a5c",
@@ -111,9 +99,7 @@ def _axis(title: str = "", **kw) -> dict:
     )
 
 
-# ---------------------------------------------------------------------------
 # MAPS — SQL run directly against the connection
-# ---------------------------------------------------------------------------
 
 _SQL_PORT_VOLUME = """
 SELECT
@@ -392,10 +378,7 @@ def plot_shipment_path(conn: sqlite3.Connection, bl_number: str) -> go.Figure:
     return fig
 
 
-# ---------------------------------------------------------------------------
 # OPERATIONS
-# ---------------------------------------------------------------------------
-
 
 def plot_delay_by_route(df: pd.DataFrame) -> go.Figure:
     """Horizontal grouped bar: avg and max delay per route, sorted by avg delay."""
@@ -565,10 +548,7 @@ def plot_voyage_status(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-# ---------------------------------------------------------------------------
 # COMMERCIAL
-# ---------------------------------------------------------------------------
-
 
 def plot_top_customers(df: pd.DataFrame, top_n: int = 10) -> go.Figure:
     """Horizontal bar: top customers by total shipment value, coloured by industry."""

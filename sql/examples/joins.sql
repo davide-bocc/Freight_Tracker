@@ -1,7 +1,5 @@
--- ============================================================================
--- JOIN SHOWCASE  —  Freight Tracker
+-- JOIN SHOWCASE
 -- 6 queries demonstrating JOIN patterns across the schema.
--- ============================================================================
 
 
 -- 1. INNER JOIN
@@ -41,7 +39,7 @@ ORDER BY r.route_id;
 
 -- 3. MULTI-TABLE JOIN (6 tables)
 -- Full shipment manifest: customer, vessel, origin port, destination port,
--- incoterms, and cargo weight — everything ops needs at a glance.
+-- incoterms, and cargo weight.
 SELECT
     s.bl_number,
     c.company_name,
@@ -70,7 +68,7 @@ SELECT
     r.route_name,
     rl1.leg_sequence AS leg_num,
     p_from.port_name AS departure_port,
-    p_mid.port_name AS junction_port,       -- shared waypoint
+    p_mid.port_name AS junction_port, -- shared waypoint
     p_to.port_name AS arrival_port,
     rl1.distance_nm AS leg1_nm,
     rl2.distance_nm AS leg2_nm,
@@ -89,7 +87,7 @@ ORDER BY r.route_name, rl1.leg_sequence;
 
 -- 5. SUBQUERY IN WHERE
 -- Flag shipments whose declared value exceeds the average for all shipments
--- on the same route — useful for insurance tier and risk-review queues.
+-- on the same route
 SELECT
     s.bl_number,
     c.company_name,
@@ -111,8 +109,7 @@ ORDER BY s.total_value_usd DESC;
 
 
 -- 6. EXISTS
--- Which vessels are on voyages that have at least one shipment stuck on
--- a Customs Hold?  Operations uses this to prioritise broker follow-up.
+-- Vessels with at least one shipment on Customs Hold.
 SELECT DISTINCT
     v.vessel_name,
     v.imo_number,

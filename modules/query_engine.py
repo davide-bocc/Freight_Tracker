@@ -1,13 +1,13 @@
 """
-query_engine.py — Predefined analytics queries for Freight Tracker.
+query_engine.py
 
-All public functions accept a sqlite3.Connection and return a pandas DataFrame.
-SQL constants are exposed so callers can inspect or extend them.
+Predefined SQL queries for the Freight Tracker analytics dashboard.
+Each function takes a sqlite3.Connection and returns a pandas DataFrame.
 
 Usage:
     from modules.query_engine import get_all_kpis, run_query
     kpis = get_all_kpis(conn)
-    df = run_query(conn, "SELECT * FROM VESSEL")
+    df   = run_query(conn, "SELECT * FROM VESSEL")
 """
 
 from __future__ import annotations
@@ -15,9 +15,7 @@ from __future__ import annotations
 import sqlite3
 import pandas as pd
 
-# ---------------------------------------------------------------------------
 # FLEET
-# ---------------------------------------------------------------------------
 
 SQL_VESSEL_UTILIZATION = """
 SELECT
@@ -69,9 +67,7 @@ FLEET = {
     "capacity_vs_booked_teu": SQL_CAPACITY_VS_BOOKED_TEU,
 }
 
-# ---------------------------------------------------------------------------
 # NETWORK
-# ---------------------------------------------------------------------------
 
 SQL_BUSIEST_PORTS = """
 SELECT
@@ -138,9 +134,7 @@ NETWORK = {
     "leg_distances": SQL_LEG_DISTANCES,
 }
 
-# ---------------------------------------------------------------------------
 # OPERATIONS
-# ---------------------------------------------------------------------------
 
 SQL_ON_TIME_PERFORMANCE = """
 SELECT
@@ -212,9 +206,7 @@ OPERATIONS = {
     "avg_delay_by_port": SQL_AVG_DELAY_BY_PORT,
 }
 
-# ---------------------------------------------------------------------------
 # COMMERCIAL
-# ---------------------------------------------------------------------------
 
 SQL_TOP_CUSTOMERS_BY_VALUE = """
 SELECT
@@ -303,10 +295,7 @@ COMMERCIAL = {
     "reefer_summary": SQL_REEFER_SUMMARY,
 }
 
-# ---------------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------------
-
 
 def run_query(conn: sqlite3.Connection, sql: str, params: tuple = ()) -> pd.DataFrame:
     """Execute arbitrary SQL and return results as a DataFrame."""

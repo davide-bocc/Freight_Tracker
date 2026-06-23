@@ -1,9 +1,12 @@
 """
-db_setup.py — Freight Tracker database initialisation and seeding.
+db_setup.py
+
+Schema and seed for the Freight Tracker database.
+12 tables covering fleet, routes, voyages, shipments and cargo tracking.
+Data is synthetic but based on real ports, vessels and trade lanes.
 
 Usage:
     python -m modules.db_setup data/database.db
-    from modules.db_setup import init_db
 """
 
 from __future__ import annotations
@@ -15,9 +18,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# ---------------------------------------------------------------------------
 # Schema DDL
-# ---------------------------------------------------------------------------
 
 _DDL = """
 PRAGMA journal_mode = WAL;
@@ -188,9 +189,7 @@ CREATE INDEX IF NOT EXISTS idx_event_port ON SHIPMENT_EVENT(port_id);
 CREATE INDEX IF NOT EXISTS idx_event_type ON SHIPMENT_EVENT(event_type);
 """
 
-# ---------------------------------------------------------------------------
 # Static reference data
-# ---------------------------------------------------------------------------
 
 _PORTS = [
     # (un_locode, name, country, lat, lon, tz, is_transshipment)
@@ -385,10 +384,7 @@ _OPERATORS = [
     "PIL",
 ]
 
-# ---------------------------------------------------------------------------
 # Helper utilities
-# ---------------------------------------------------------------------------
-
 
 def _iso(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%dT%H:%M:%S")
@@ -430,10 +426,7 @@ def _container_number(prefix: str, seq: int) -> str:
     return f"{number}{check}"
 
 
-# ---------------------------------------------------------------------------
 # Seeding
-# ---------------------------------------------------------------------------
-
 
 def _seed(conn: sqlite3.Connection) -> None:
     rng = random.Random(42)
@@ -442,7 +435,7 @@ def _seed(conn: sqlite3.Connection) -> None:
 
     cur = conn.cursor()
 
-    # ports --
+    # ports
     cur.executemany(
         "INSERT OR IGNORE INTO PORT "
         "(un_locode,port_name,country_code,latitude,longitude,timezone,is_transshipment) "
@@ -450,7 +443,7 @@ def _seed(conn: sqlite3.Connection) -> None:
         _PORTS,
     )
 
-    # vessels --
+    # vessels
     cur.executemany(
         "INSERT OR IGNORE INTO VESSEL "
         "(imo_number,vessel_name,vessel_type,flag_state,gross_tonnage,"
@@ -458,7 +451,7 @@ def _seed(conn: sqlite3.Connection) -> None:
         _VESSELS,
     )
 
-    # routes --
+    # routes
     port_ids: list[int] = [
         cur.execute("SELECT port_id FROM PORT WHERE un_locode=?", (p[0],)).fetchone()[0]
         for p in _PORTS
@@ -478,7 +471,7 @@ def _seed(conn: sqlite3.Connection) -> None:
             ).fetchone()[0]
         )
 
-    # route legs --
+    # route legs
     for r_idx, seq, fp_i, tp_i, nm, days in _LEGS_DEF:
         cur.execute(
             "INSERT OR IGNORE INTO ROUTE_LEG "
@@ -487,7 +480,7 @@ def _seed(conn: sqlite3.Connection) -> None:
             (route_ids[r_idx], seq, port_ids[fp_i], port_ids[tp_i], nm, days),
         )
 
-    # customers --
+    # customers
     customer_ids: list[int] = []
     for row in _CUSTOMERS:
         cur.execute(
@@ -509,7 +502,7 @@ def _seed(conn: sqlite3.Connection) -> None:
         for v in _VESSELS
     ]
 
-    # voyages (60 over 18 months) --
+    # voyages (60 over 18 months)
     voyage_ids: list[int] = []
     voyage_meta: list[dict] = []  # {voyage_id, route_idx, status, dep, arr}
 
@@ -554,7 +547,7 @@ def _seed(conn: sqlite3.Connection) -> None:
             }
         )
 
-    # voyage stops --
+    # voyage stops
     for meta in voyage_meta:
         vid = meta["voyage_id"]
         r_idx = meta["route_idx"]
@@ -619,7 +612,7 @@ def _seed(conn: sqlite3.Connection) -> None:
             )
             cursor_dt = _add_days(etd, max(0, leg_days))
 
-    # shipments (200) --
+    # shipments (200)
     shipment_meta: list[dict] = []
     ctr_seq = 1000
 
@@ -675,7 +668,7 @@ def _seed(conn: sqlite3.Connection) -> None:
             }
         )
 
-        # containers (1-3 per shipment) --
+        # containers (1-3 per shipment)
         n_containers = rng.randint(1, 3)
         ctype_choices = list(_CONTAINER_SPECS.keys())
         for _ in range(n_containers):
@@ -710,7 +703,7 @@ def _seed(conn: sqlite3.Connection) -> None:
                 "SELECT container_id FROM CONTAINER WHERE container_number=?", (cnum,)
             ).fetchone()[0]
 
-            # cargo items (1-4 per container) --
+            # cargo items (1-4 per container)
             n_cargo = rng.randint(1, 4)
             chosen_cargo = rng.sample(_CARGO_TYPES, min(n_cargo, len(_CARGO_TYPES)))
             for hs, desc, unit, uprice in chosen_cargo:
@@ -724,7 +717,7 @@ def _seed(conn: sqlite3.Connection) -> None:
                     (ctr_id, hs, desc, qty, unit, w, val),
                 )
 
-    # shipment events --
+    # shipment events
     # Full tracking chain consistent with shipment status
     event_chains = {
         "Booked": ["Booking Confirmed"],
@@ -834,10 +827,8 @@ def _seed(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
 
+# Public API
 
 def init_db(db_path: str | Path = ":memory:") -> sqlite3.Connection:
     """
@@ -864,9 +855,7 @@ def init_db(db_path: str | Path = ":memory:") -> sqlite3.Connection:
     return conn
 
 
-# ---------------------------------------------------------------------------
 # CLI entry point
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     path = sys.argv[1] if len(sys.argv) > 1 else "data/database.db"

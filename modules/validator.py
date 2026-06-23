@@ -1,28 +1,15 @@
 """
-validator.py — SQL validation for Freight Tracker text-to-SQL pipeline.
+validator.py
 
-Public API
-----------
-validate(sql, conn) -> ValidationResult
+SQL security and syntax validator for the text-to-SQL pipeline.
+Blocks dangerous statements, enforces SELECT-only queries and
+clamps LIMIT to 1000 before any query reaches the database.
 
-Checks (in order)
------------------
-1.  Non-empty input
-2.  No comment syntax (-- or /* */)                   SECURITY
-3.  No multiple statements (semicolon injection)       SECURITY
-4.  No forbidden write/admin keywords                  SECURITY
-5.  Must begin with SELECT or WITH (CTE)               SECURITY
-6.  LIMIT injection / clamping to MAX_ROWS             SAFETY
-7.  All referenced tables exist in schema              SYNTAX
-8.  SQLite EXPLAIN syntax + query-plan check           SYNTAX
-
-ValidationResult keys
----------------------
-  is_valid      bool       — True only when errors list is empty
-  sanitized_sql str        — LIMIT-capped SQL ready to execute;
-                             empty string when is_valid is False
-  errors        list[str]  — blocking issues (ordered by check)
-  warnings      list[str]  — non-blocking notes (LIMIT changes, etc.)
+Usage:
+    from modules.validator import validate
+    result = validate(sql, conn)
+    if result["is_valid"]:
+        df = run_query(conn, result["sanitized_sql"])
 """
 
 from __future__ import annotations
@@ -31,9 +18,7 @@ import re
 import sqlite3
 from typing import TypedDict
 
-# ---------------------------------------------------------------------------
 # Public constants
-# ---------------------------------------------------------------------------
 
 MAX_ROWS = 1000
 
@@ -53,10 +38,7 @@ KNOWN_TABLES: frozenset[str] = frozenset(
     }
 )
 
-# ---------------------------------------------------------------------------
 # Result type
-# ---------------------------------------------------------------------------
-
 
 class ValidationResult(TypedDict):
     is_valid: bool
@@ -65,9 +47,7 @@ class ValidationResult(TypedDict):
     warnings: list[str]
 
 
-# ---------------------------------------------------------------------------
 # Compiled regex patterns
-# ---------------------------------------------------------------------------
 
 # Write/admin keywords that must never appear in read-only queries
 _BLOCKED_KW_RE = re.compile(
@@ -95,9 +75,7 @@ _CTE_NAME_RE = re.compile(
     re.IGNORECASE,
 )
 
-# ---------------------------------------------------------------------------
 # String-aware helpers
-# ---------------------------------------------------------------------------
 
 
 def _semicolons_outside_strings(sql: str) -> list[int]:
@@ -134,10 +112,7 @@ def _extract_table_refs(sql: str) -> set[str]:
     return {m.upper() for m in _TABLE_REF_RE.findall(sql)}
 
 
-# ---------------------------------------------------------------------------
 # Individual validation steps (each appends to errors / warnings)
-# ---------------------------------------------------------------------------
-
 
 def _check_empty(sql: str, errors: list[str]) -> bool:
     if not sql or not sql.strip():
@@ -254,9 +229,7 @@ def _check_syntax(sql: str, conn: sqlite3.Connection, errors: list[str]) -> None
         errors.append(f"Database error during syntax check: {exc}")
 
 
-# ---------------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------------
 
 
 def validate(sql: str, conn: sqlite3.Connection) -> ValidationResult:

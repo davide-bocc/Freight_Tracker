@@ -12,10 +12,7 @@ from modules.query_engine import (
     get_all_kpis,
 )
 
-# ---------------------------------------------------------------------------
 # Fixtures
-# ---------------------------------------------------------------------------
-
 
 @pytest.fixture(scope="module")
 def conn():
@@ -29,9 +26,7 @@ def kpis(conn):
     return get_all_kpis(conn)
 
 
-# ---------------------------------------------------------------------------
 # Expected columns per named query (set — order-independent subset check)
-# ---------------------------------------------------------------------------
 
 EXPECTED_COLUMNS: dict[str, set[str]] = {
     "vessel_utilization": {
@@ -186,10 +181,7 @@ EXPECTED_COLUMNS: dict[str, set[str]] = {
 
 ALL_QUERY_NAMES = list(EXPECTED_COLUMNS)
 
-# ---------------------------------------------------------------------------
 # run_query
-# ---------------------------------------------------------------------------
-
 
 def test_run_query_returns_dataframe(conn):
     df = run_query(conn, "SELECT vessel_id, vessel_name FROM VESSEL")
@@ -211,10 +203,7 @@ def test_run_query_empty_result_is_dataframe(conn):
     assert len(df) == 0
 
 
-# ---------------------------------------------------------------------------
 # Category functions — dict shape and value types
-# ---------------------------------------------------------------------------
-
 
 def test_fleet_keys_and_types(conn):
     result = fleet(conn)
@@ -250,10 +239,7 @@ def test_commercial_keys_and_types(conn):
     assert all(isinstance(v, pd.DataFrame) for v in result.values())
 
 
-# ---------------------------------------------------------------------------
 # get_all_kpis — dict shape
-# ---------------------------------------------------------------------------
-
 
 def test_get_all_kpis_returns_all_keys(kpis):
     assert set(kpis) == set(ALL_QUERY_NAMES)
@@ -264,10 +250,7 @@ def test_get_all_kpis_all_values_are_dataframes(kpis):
     assert not non_df, f"Non-DataFrame values for: {non_df}"
 
 
-# ---------------------------------------------------------------------------
 # Per-query: DataFrame type, expected columns, non-empty
-# ---------------------------------------------------------------------------
-
 
 @pytest.mark.parametrize("query_name", ALL_QUERY_NAMES)
 def test_kpi_is_dataframe(kpis, query_name):

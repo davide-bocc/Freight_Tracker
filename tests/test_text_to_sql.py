@@ -1,11 +1,6 @@
 """
 Tests for modules/validator.py and modules/text_to_sql.py.
-
-Coverage
---------
-validator.validate()    : security blocks, SELECT allow, LIMIT injection, syntax checks
-ConversationHistory     : add_user/add_assistant, get_messages window, clear, at_limit
-ask()                   : successful round-trip, API error, limit guard — Anthropic mocked
+Covers SQL security validation, conversation history lifecycle and the ask() function with mocked API.
 """
 
 from __future__ import annotations
@@ -24,9 +19,7 @@ from modules.text_to_sql import (
     ask,
 )
 
-# ---------------------------------------------------------------------------
 # Shared fixture
-# ---------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -36,10 +29,7 @@ def conn():
     c.close()
 
 
-# ---------------------------------------------------------------------------
 # Helper — build a mock Anthropic client from a raw response string
-# ---------------------------------------------------------------------------
-
 
 def _mock_client(response_text: str) -> MagicMock:
     content = MagicMock()
@@ -51,10 +41,7 @@ def _mock_client(response_text: str) -> MagicMock:
     return client
 
 
-# ============================================================================
 # validator.validate() — security blocks
-# ============================================================================
-
 
 class TestValidatorBlocked:
 
@@ -113,10 +100,7 @@ class TestValidatorBlocked:
         assert result["errors"]
 
 
-# ============================================================================
 # validator.validate() — SELECT allowed
-# ============================================================================
-
 
 class TestValidatorAllowed:
 
@@ -163,10 +147,7 @@ class TestValidatorAllowed:
         assert isinstance(result["warnings"], list)
 
 
-# ============================================================================
 # validator.validate() — LIMIT injection
-# ============================================================================
-
 
 class TestValidatorLimit:
 
@@ -194,10 +175,7 @@ class TestValidatorLimit:
         assert not result["sanitized_sql"].rstrip().endswith(";")
 
 
-# ============================================================================
 # validator.validate() — syntax error detection
-# ============================================================================
-
 
 class TestValidatorSyntax:
 
@@ -220,10 +198,8 @@ class TestValidatorSyntax:
         assert result["errors"] == []
 
 
-# ============================================================================
-# ConversationHistory
-# ============================================================================
 
+# ConversationHistory
 
 class TestConversationHistory:
 
@@ -338,9 +314,8 @@ class TestConversationHistory:
         assert h.question_count == 2
 
 
-# ============================================================================
+
 # ask() — Anthropic client mocked
-# ============================================================================
 
 _GOOD_RESPONSE = (
     "<sql>SELECT vessel_name, vessel_type FROM VESSEL</sql>"

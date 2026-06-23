@@ -1,21 +1,14 @@
 """
-text_to_sql.py — Natural language to SQL using Google Gemini 2.5 Flash (free tier).
+text_to_sql.py
 
-Public API
-----------
-ask(question, conn, history)  -> ResultDict
-    Convert a question to SQL, validate, execute and return structured result.
+Converts natural language questions into SQL queries using Google Gemini 2.5 Flash.
+Validates the generated SQL before execution and returns results as a DataFrame.
+Includes a per-session question limit (20) to stay within the free API tier.
 
-ConversationHistory
-    Multi-turn context manager with per-session question limit (20).
-    Syncs question_count to st.session_state when Streamlit is active.
-
-ResultDict keys
----------------
-  sql          : str              — validated SQL that was executed (or attempted)
-  result_df    : DataFrame | None — query results (None on error)
-  explanation  : str              — natural language summary from the model
-  error        : str | None       — error message, None on success
+Usage:
+    from modules.text_to_sql import ask, ConversationHistory
+    history = ConversationHistory()
+    result  = ask("Which route has the highest average delay?", conn, history)
 """
 
 from __future__ import annotations
@@ -27,9 +20,7 @@ from typing import Any
 
 import pandas as pd
 
-# ---------------------------------------------------------------------------
 # Optional dependencies — fail gracefully at import time
-# ---------------------------------------------------------------------------
 
 try:
     from google import genai
@@ -55,9 +46,7 @@ except ImportError:
 from modules.db_setup import _DDL as _SCHEMA_DDL
 from modules.query_engine import run_query
 
-# ---------------------------------------------------------------------------
 # Constants
-# ---------------------------------------------------------------------------
 
 QUESTION_LIMIT = 20  # max questions per browser session
 _MODEL = "gemini-2.5-flash"
@@ -65,9 +54,7 @@ _MAX_TOKENS = 2048
 _MAX_ROWS = 1000
 _MAX_HISTORY_TURNS = 10  # keep last N question/answer pairs in context
 
-# ---------------------------------------------------------------------------
 # System prompt
-# ---------------------------------------------------------------------------
 
 _SYSTEM_PROMPT = f"""You are a senior data analyst assistant embedded in Freight Tracker, \
 a shipping intelligence platform.
@@ -135,10 +122,7 @@ CONSTRAINTS:
 • Qualify column names with table aliases whenever joining two or more tables.
 """
 
-# ---------------------------------------------------------------------------
 # Conversation history
-# ---------------------------------------------------------------------------
-
 
 class ConversationHistory:
     """
@@ -211,9 +195,7 @@ class ConversationHistory:
         self._write_session_state(self.question_count)
 
 
-# ---------------------------------------------------------------------------
 # SQL validation helpers
-# ---------------------------------------------------------------------------
 
 _BLOCKED_KW = re.compile(
     r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|REPLACE|EXEC(?:UTE)?"
@@ -267,10 +249,7 @@ def _enforce_limit(sql: str, max_rows: int = _MAX_ROWS) -> str:
     return sql
 
 
-# ---------------------------------------------------------------------------
 # Response parsing
-# ---------------------------------------------------------------------------
-
 
 def _parse_response(text: str) -> tuple[str, str]:
     """
@@ -302,10 +281,7 @@ def _parse_response(text: str) -> tuple[str, str]:
     return "", text.strip()
 
 
-# ---------------------------------------------------------------------------
 # Gemini client
-# ---------------------------------------------------------------------------
-
 
 def _get_client():
     if not _HAS_GEMINI:
@@ -322,9 +298,7 @@ def _get_client():
     return genai.Client(api_key=api_key)
 
 
-# ---------------------------------------------------------------------------
 # Public API
-# ---------------------------------------------------------------------------
 
 ResultDict = dict[str, Any]
 

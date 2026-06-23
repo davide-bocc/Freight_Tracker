@@ -1,205 +1,129 @@
--- ============================================================================
 -- ROW COUNTS
--- Expected: VESSEL=10, PORT=20, ROUTE=10, ROUTE_LEG=26, VOYAGE=60,
---           VOYAGE_STOP=216, CUSTOMER=15, SHIPMENT=200, CONTAINER=412,
---           CARGO_ITEM=1031, SHIPMENT_EVENT=1758
--- ============================================================================
+-- Verify that all tables were seeded correctly.
 
-SELECT
-    'VESSEL' AS table_name,
-    COUNT(*) AS row_count
-FROM vessel
-UNION ALL
+SELECT 'VESSEL' AS table_name, COUNT(*) AS row_count
+FROM vessel UNION ALL
 
-SELECT
-    'PORT',
-    COUNT(*)
-FROM port
-UNION ALL
+SELECT 'PORT', COUNT(*)
+FROM port UNION ALL
 
-SELECT
-    'ROUTE',
-    COUNT(*)
-FROM route
-UNION ALL
+SELECT 'ROUTE', COUNT(*)
+FROM route UNION ALL
 
-SELECT
-    'ROUTE_LEG',
-    COUNT(*)
-FROM route_leg
-UNION ALL
+SELECT 'ROUTE_LEG', COUNT(*)
+FROM route_leg UNION ALL
 
-SELECT
-    'VOYAGE',
-    COUNT(*)
-FROM voyage
-UNION ALL
+SELECT 'VOYAGE', COUNT(*)
+FROM voyage UNION ALL
 
-SELECT
-    'VOYAGE_STOP',
-    COUNT(*)
-FROM voyage_stop
-UNION ALL
+SELECT 'VOYAGE_STOP', COUNT(*)
+FROM voyage_stop UNION ALL
 
-SELECT
-    'CUSTOMER',
-    COUNT(*)
-FROM customer
-UNION ALL
+SELECT 'CUSTOMER', COUNT(*)
+FROM customer UNION ALL
 
-SELECT
-    'SHIPMENT',
-    COUNT(*)
-FROM shipment
-UNION ALL
+SELECT 'SHIPMENT', COUNT(*)
+FROM shipment UNION ALL
 
-SELECT
-    'CONTAINER',
-    COUNT(*)
-FROM container
-UNION ALL
+SELECT 'CONTAINER', COUNT(*)
+FROM container UNION ALL
 
-SELECT
-    'CARGO_ITEM',
-    COUNT(*)
-FROM cargo_item
-UNION ALL
+SELECT 'CARGO_ITEM', COUNT(*)
+FROM cargo_item UNION ALL
 
-SELECT
-    'SHIPMENT_EVENT',
-    COUNT(*)
+SELECT 'SHIPMENT_EVENT', COUNT(*)
 FROM shipment_event;
 
 -- FK INTEGRITY
--- Each query returns 0 rows when the database is clean.
--- A non-zero count names the broken FK and the orphan count.
+-- Each query returns 0 rows if the database is clean.
 
 -- ROUTE.origin_port_id -> PORT
-SELECT
-    'ROUTE.origin_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'ROUTE.origin_port_id' AS fk, COUNT(*) AS orphans
 FROM route
 WHERE origin_port_id NOT IN (SELECT port_id FROM port);
 
 -- ROUTE.dest_port_id -> PORT
-SELECT
-    'ROUTE.dest_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'ROUTE.dest_port_id' AS fk, COUNT(*) AS orphans
 FROM route
 WHERE dest_port_id NOT IN (SELECT port_id FROM port);
 
 -- ROUTE_LEG.route_id -> ROUTE
-SELECT
-    'ROUTE_LEG.route_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'ROUTE_LEG.route_id' AS fk, COUNT(*) AS orphans
 FROM route_leg
 WHERE route_id NOT IN (SELECT route_id FROM route);
 
 -- ROUTE_LEG.from_port_id -> PORT
-SELECT
-    'ROUTE_LEG.from_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'ROUTE_LEG.from_port_id' AS fk, COUNT(*) AS orphans
 FROM route_leg
 WHERE from_port_id NOT IN (SELECT port_id FROM port);
 
 -- ROUTE_LEG.to_port_id -> PORT
-SELECT
-    'ROUTE_LEG.to_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'ROUTE_LEG.to_port_id' AS fk, COUNT(*) AS orphans
 FROM route_leg
 WHERE to_port_id NOT IN (SELECT port_id FROM port);
 
 -- VOYAGE.vessel_id -> VESSEL
-SELECT
-    'VOYAGE.vessel_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'VOYAGE.vessel_id' AS fk, COUNT(*) AS orphans
 FROM voyage
 WHERE vessel_id NOT IN (SELECT vessel_id FROM vessel);
 
 -- VOYAGE.route_id -> ROUTE
-SELECT
-    'VOYAGE.route_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'VOYAGE.route_id' AS fk, COUNT(*) AS orphans
 FROM voyage
 WHERE route_id NOT IN (SELECT route_id FROM route);
 
 -- VOYAGE_STOP.voyage_id -> VOYAGE
-SELECT
-    'VOYAGE_STOP.voyage_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'VOYAGE_STOP.voyage_id' AS fk, COUNT(*) AS orphans
 FROM voyage_stop
 WHERE voyage_id NOT IN (SELECT voyage_id FROM voyage);
 
 -- VOYAGE_STOP.port_id -> PORT
-SELECT
-    'VOYAGE_STOP.port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'VOYAGE_STOP.port_id' AS fk, COUNT(*) AS orphans
 FROM voyage_stop
 WHERE port_id NOT IN (SELECT port_id FROM port);
 
 -- SHIPMENT.customer_id -> CUSTOMER
-SELECT
-    'SHIPMENT.customer_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT.customer_id' AS fk, COUNT(*) AS orphans
 FROM shipment
 WHERE customer_id NOT IN (SELECT customer_id FROM customer);
 
 -- SHIPMENT.voyage_id -> VOYAGE
-SELECT
-    'SHIPMENT.voyage_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT.voyage_id' AS fk, COUNT(*) AS orphans
 FROM shipment
 WHERE voyage_id NOT IN (SELECT voyage_id FROM voyage);
 
 -- SHIPMENT.origin_port_id -> PORT
-SELECT
-    'SHIPMENT.origin_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT.origin_port_id' AS fk, COUNT(*) AS orphans
 FROM shipment
 WHERE origin_port_id NOT IN (SELECT port_id FROM port);
 
 -- SHIPMENT.dest_port_id -> PORT
-SELECT
-    'SHIPMENT.dest_port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT.dest_port_id' AS fk, COUNT(*) AS orphans
 FROM shipment
 WHERE dest_port_id NOT IN (SELECT port_id FROM port);
 
 -- CONTAINER.shipment_id -> SHIPMENT
-SELECT
-    'CONTAINER.shipment_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'CONTAINER.shipment_id' AS fk, COUNT(*) AS orphans
 FROM container
 WHERE shipment_id NOT IN (SELECT shipment_id FROM shipment);
 
 -- CARGO_ITEM.container_id -> CONTAINER
-SELECT
-    'CARGO_ITEM.container_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'CARGO_ITEM.container_id' AS fk, COUNT(*) AS orphans
 FROM cargo_item
 WHERE container_id NOT IN (SELECT container_id FROM container);
 
 -- SHIPMENT_EVENT.shipment_id -> SHIPMENT
-SELECT
-    'SHIPMENT_EVENT.shipment_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT_EVENT.shipment_id' AS fk, COUNT(*) AS orphans
 FROM shipment_event
 WHERE shipment_id NOT IN (SELECT shipment_id FROM shipment);
 
 -- SHIPMENT_EVENT.port_id -> PORT (nullable — exclude NULLs)
-SELECT
-    'SHIPMENT_EVENT.port_id' AS fk,
-    COUNT(*) AS orphans
+SELECT 'SHIPMENT_EVENT.port_id' AS fk, COUNT(*) AS orphans
 FROM shipment_event
-WHERE
-    port_id IS NOT NULL
-    AND port_id NOT IN (SELECT port_id FROM port);
+WHERE port_id IS NOT NULL AND port_id NOT IN (SELECT port_id FROM port);
 
-
--- ============================================================================
--- FLEET — vessel roster with capacity and utilisation context
--- Joins VESSEL to VOYAGE to confirm every vessel has at least one voyage.
--- ============================================================================
+-- FLEET
+-- Vessel roster with capacity, joined to VOYAGE to verify each vessel has at least one voyage.
 
 SELECT
     v.vessel_name,
@@ -215,11 +139,8 @@ LEFT JOIN voyage AS vo ON v.vessel_id = vo.vessel_id
 GROUP BY v.vessel_id
 ORDER BY total_voyages DESC;
 
-
--- ============================================================================
--- NETWORK — route map with named origin/destination ports and leg count
--- Joins ROUTE to PORT twice (origin, destination) and counts legs per route.
--- ============================================================================
+-- NETWORK
+-- Route map with named origin and destination ports and total leg count per route.
 
 SELECT
     r.route_name,
@@ -238,12 +159,9 @@ LEFT JOIN route_leg AS rl ON r.route_id = rl.route_id
 GROUP BY r.route_id
 ORDER BY r.transit_days DESC;
 
-
--- ============================================================================
--- OPERATIONS — voyage schedule with vessel name, route, and stop count
--- Joins VOYAGE to VESSEL, ROUTE, and aggregates VOYAGE_STOP.
+-- OPERATIONS
+-- Voyage schedule with vessel name, route and stop count.
 -- Confirms stop records exist and delay data is populated.
--- ============================================================================
 
 SELECT
     vo.voyage_number,
@@ -263,12 +181,9 @@ GROUP BY vo.voyage_id
 ORDER BY vo.departure_date
 LIMIT 20;
 
-
--- ============================================================================
--- COMMERCIAL — shipment detail with customer, ports, container and cargo totals
--- Joins SHIPMENT to CUSTOMER, PORT (x2), CONTAINER, and CARGO_ITEM.
+-- COMMERCIAL
+-- Shipment detail with customer, ports, container and cargo totals.
 -- Confirms the full commercial chain resolves end-to-end.
--- ============================================================================
 
 SELECT
     s.bl_number,
@@ -291,12 +206,9 @@ GROUP BY s.shipment_id
 ORDER BY total_cargo_usd DESC
 LIMIT 20;
 
-
--- ============================================================================
--- TRACKING — full event timeline for one shipment, resolved to port names
--- Joins SHIPMENT_EVENT to SHIPMENT and PORT.
+-- TRACKING
+-- Full event timeline for one shipment with resolved port names.
 -- Confirms event chain is ordered and port references resolve.
--- ============================================================================
 
 SELECT
     se.event_timestamp,

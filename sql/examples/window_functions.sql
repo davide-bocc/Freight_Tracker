@@ -1,12 +1,10 @@
--- ============================================================================
--- WINDOW FUNCTION SHOWCASE  —  Freight Tracker
+-- WINDOW FUNCTION SHOWCASE
 -- 6 queries demonstrating analytic/window functions across the schema.
--- ============================================================================
 
 
 -- 1. RANK
--- Which voyage stops had the worst delays, ranked within each port?
--- Ties (equal delay_hours) share a rank; the next rank skips accordingly.
+-- Ranks voyage stops by delay within each port.
+-- Ties share the same rank; the next rank skips accordingly.
 SELECT
     p.port_name,
     vo.voyage_number,
@@ -43,7 +41,7 @@ ORDER BY c.country_code, revenue_rank_in_country;
 
 -- 3. ROW_NUMBER
 -- Assign a unique sequence number to each shipment per customer, ordered by
--- booking date — useful for identifying a customer's first, second, nth booking.
+-- booking date
 SELECT
     c.company_name,
     s.bl_number,
@@ -81,8 +79,7 @@ ORDER BY vo.voyage_number, vs.stop_sequence;
 
 
 -- 5. LEAD
--- For each route leg, show the distance of the next leg on the same route
--- so planners can see whether the upcoming segment is longer or shorter.
+-- Shows the distance of the current leg and the next leg on the same route.
 SELECT
     r.route_name,
     rl.leg_sequence,
@@ -105,8 +102,7 @@ ORDER BY r.route_name, rl.leg_sequence;
 
 
 -- 6. RUNNING TOTAL with SUM OVER
--- Monthly shipment count and cumulative revenue (YTD running total) so
--- management can track booking momentum through the calendar year.
+-- Monthly shipment count and cumulative revenue as a running total.
 WITH monthly AS (
     SELECT
         STRFTIME('%Y', booking_date) AS booking_year,
